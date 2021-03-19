@@ -1,10 +1,22 @@
 package hu.holyoil;
 
+import hu.holyoil.skeleton.TestFramework;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static final Boolean isTestMode = true;
 
-        System.out.println("Hello world");
+    public static void main(String[] args) {
+        // System.out.println("Hello world");
+
+        //TestCase t = new Example();
+        //t.PlayScenario();
+
+
+        if (isTestMode) {
+            TestFramework.getInstance().AddTestcases();
+            TestFramework.getInstance().RunTestcases();
+        }
 
     }
 

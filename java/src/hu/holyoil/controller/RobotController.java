@@ -1,7 +1,6 @@
 package hu.holyoil.controller;
 
 import hu.holyoil.crewmate.Robot;
-import jdk.jshell.spi.ExecutionControl;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class RobotController implements ISteppable {
     }
 
     private RobotController() {
-
+        //robots = new ArrayList<>();
     }
 
 }
