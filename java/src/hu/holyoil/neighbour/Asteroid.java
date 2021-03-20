@@ -41,11 +41,11 @@ public class Asteroid implements INeighbour {
         Logger.Log(this, "Reacting to move from " + Logger.GetName(from) + " by " + Logger.GetName(abstractCrewmate));
         Logger.Return();
 
-        crewmates.add(abstractCrewmate);
-
         Logger.Log(this, "Removing Crewmate");
         from.RemoveCrewmate(abstractCrewmate);
         Logger.Return();
+
+        crewmates.add(abstractCrewmate);
 
         Logger.Log(this, "Setting onAsteroid of Crewmate");
         abstractCrewmate.SetOnAsteroid(this);
