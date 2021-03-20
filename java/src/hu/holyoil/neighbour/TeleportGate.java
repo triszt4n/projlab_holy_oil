@@ -77,6 +77,8 @@ public class TeleportGate implements INeighbour {
     private void ActuallyExplode() {
         if ((homeAsteroid == null && homeStorage == null) ||(homeAsteroid != null && homeStorage != null)) {
             // Error
+            //Logger.Log(this, "Caused an error");
+            //Logger.Return();
         }
         if ((homeAsteroid == null && homeStorage != null)) {
             // in storage
