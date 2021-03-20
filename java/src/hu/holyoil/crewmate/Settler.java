@@ -27,10 +27,13 @@ public class Settler extends AbstractCrewmate implements IStorageCapable {
     @Override
     public void Die() {
         Logger.Log(this, "Died");
-        GameController.getInstance().RemoveSettler(this);
+
+        GameController.GetInstance().RemoveSettler(this);
+
         if (storage.GetOneTeleporter() != null) {
             storage.GetOneTeleporter().Explode();
         }
+
         onAsteroid.RemoveCrewmate(this);
         Logger.Return();
     }
@@ -45,14 +48,14 @@ public class Settler extends AbstractCrewmate implements IStorageCapable {
     @Override
     public void CraftRobot() {
         Logger.Log(this, "Crafting robot");
-        RobotRecipe.getInstance().Craft(this, onAsteroid);
+        RobotRecipe.GetInstance().Craft(this, onAsteroid);
         Logger.Return();
     }
 
     @Override
     public void CraftTeleportGate() {
         Logger.Log(this, "Crafting teleport gate pair.");
-        TeleporterRecipe.getInstance().Craft(this, onAsteroid);
+        TeleporterRecipe.GetInstance().Craft(this, onAsteroid);
         Logger.Return();
     }
 
@@ -93,8 +96,8 @@ public class Settler extends AbstractCrewmate implements IStorageCapable {
     public void PlaceResource(AbstractBaseResource abstractBaseResource) {
 
         Logger.Log(this, "Placing resource " + Logger.GetName(abstractBaseResource));
-
-        onAsteroid.SetResource(abstractBaseResource);
+        if(onAsteroid.GetResource()==null)
+             onAsteroid.SetResource(abstractBaseResource);
 
         Logger.Return();
     }

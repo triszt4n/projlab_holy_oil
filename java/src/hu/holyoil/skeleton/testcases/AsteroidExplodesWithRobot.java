@@ -30,11 +30,11 @@ public class AsteroidExplodesWithRobot extends TestCase {
         robot = new Robot(asteroid);
         Logger.RegisterObject(robot, "r: Robot");
 
-        Logger.RegisterObject(SunController.getInstance(), ": SunController");
-        Logger.RegisterObject(GameController.getInstance(), ": GameController");
+        Logger.RegisterObject(SunController.GetInstance(), ": SunController");
+        Logger.RegisterObject(GameController.GetInstance(), ": GameController");
 
-        SunController.getInstance().AddAsteroid(asteroid);
-        GameController.getInstance().AddAsteroid(asteroid);
+        SunController.GetInstance().AddAsteroid(asteroid);
+        GameController.GetInstance().AddAsteroid(asteroid);
 
         if (hasTeleport) {
             TeleportGate pair1 = new TeleportGate();
@@ -60,8 +60,8 @@ public class AsteroidExplodesWithRobot extends TestCase {
             Logger.RegisterObject(newHome, "neigh: Asteroid");
             asteroid.AddNeighbourAsteroid(newHome);
 
-            SunController.getInstance().AddAsteroid(newHome);
-            GameController.getInstance().AddAsteroid(newHome);
+            SunController.GetInstance().AddAsteroid(newHome);
+            GameController.GetInstance().AddAsteroid(newHome);
 
             neighbour = newHome;
         }
