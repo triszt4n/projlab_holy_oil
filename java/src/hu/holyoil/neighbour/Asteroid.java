@@ -3,11 +3,14 @@ package hu.holyoil.neighbour;
 import hu.holyoil.IIdentifiable;
 import hu.holyoil.Main;
 import hu.holyoil.controller.GameController;
+import hu.holyoil.controller.InputOutputController;
 import hu.holyoil.controller.SunController;
 import hu.holyoil.crewmate.AbstractSpaceship;
 import hu.holyoil.crewmate.IMiner;
 import hu.holyoil.crewmate.IStorageCapable;
 import hu.holyoil.crewmate.Settler;
+import hu.holyoil.repository.AsteroidRepository;
+import hu.holyoil.repository.NeighbourBaseRepository;
 import hu.holyoil.resource.AbstractBaseResource;
 import hu.holyoil.skeleton.Logger;
 import hu.holyoil.skeleton.TestFramework;
@@ -20,6 +23,19 @@ import java.util.*;
  * Implementálja az INeighbour interfacet.
  */
 public class Asteroid implements INeighbour {
+
+    /**
+     * Az aszteroida egyedi azonosítója
+     * */
+    private String id;
+
+    /**
+     * Visszaadja az aszteroida egyedi azonosítóját.
+     * */
+    public String GetId() {
+        return id;
+    }
+
     /**
      * Konstruktor
      * Inicializálja a tagváltozókat, a listákat üresen. Az aszteroida létrehozáskor üres, nincs napközelben, és nincs felfedezve a játékosok által.
@@ -27,6 +43,13 @@ public class Asteroid implements INeighbour {
      * Nincs rajta teleporter.
      */
     public Asteroid() {
+
+        this(NeighbourBaseRepository.GetIdWithPrefix("Asteroid "));
+
+    }
+
+    public Asteroid(String name) {
+
         neighbouringAsteroids = new ArrayList<>();
         spaceships = new ArrayList<>();
         resource = null;
@@ -34,19 +57,9 @@ public class Asteroid implements INeighbour {
         isNearSun = Boolean.FALSE;
         isDiscovered = Boolean.FALSE;
         numOfLayersRemaining = 0;
-        id = Main.GetId();
-    }
+        id = name;
+        NeighbourBaseRepository.GetInstance().Add(name, this);
 
-    /**
-     * Az aszteroida egyedi azonosítója
-     * */
-    private int id;
-
-    /**
-     * Visszaadja az aszteroida egyedi azonosítóját.
-     * */
-    public int GetId() {
-        return id;
     }
 
     /**
@@ -54,21 +67,21 @@ public class Asteroid implements INeighbour {
      * */
     @Override
     public String toString() {
-        StringBuilder toReturn = new StringBuilder("ASTEROID " + id
-                + " " + isNearSun
-                + " " + numOfLayersRemaining
-                + " " + isDiscovered
-                + " " + (resource == null ? "null" : resource.GetId())
-                + " " + (teleporter == null ? "null" : teleporter.GetId()));
+        StringBuilder toReturn = new StringBuilder("ASTEROID (name:)" + id
+                + " (is near sun:)" + isNearSun
+                + " (layers left:)" + numOfLayersRemaining
+                + " (is discovered:)" + isDiscovered
+                + " (resource name:)" + (resource == null ? "null" : resource.GetId())
+                + " (teleporter name:)" + (teleporter == null ? "null" : teleporter.GetId()));
 
-        toReturn.append("[");
+        toReturn.append(" (spaceship names:)[");
         for (int i = 0; i < spaceships.size(); i++) {
             toReturn.append(spaceships.get(i).GetId());
             if (i != spaceships.size() - 1) {
                 toReturn.append(" ");
             }
         }
-        toReturn.append("] [");
+        toReturn.append("] (neighbour asteroid names:)[");
         for (int i = 0; i < neighbouringAsteroids.size(); i++) {
             toReturn.append(neighbouringAsteroids.get(i).GetId());
             if (i != neighbouringAsteroids.size() - 1) {
@@ -111,6 +124,10 @@ public class Asteroid implements INeighbour {
      * <p>Lehet null, akkor az aszteroida üres.</p>
      */
     private AbstractBaseResource resource;
+
+    public Boolean IsDiscovered() {
+        return isDiscovered;
+    }
 
     /**
      * A legénység mozgását kezelő függvény.
@@ -476,6 +493,10 @@ public class Asteroid implements INeighbour {
         spaceshipsShallowCopy.forEach(AbstractSpaceship::ReactToAsteroidExplosion);
         Logger.Return();
 
+        neighbouringAsteroids.forEach(
+                asteroid -> asteroid.RemoveNeighbouringAsteroid(this)
+        );
+
         if (teleporter != null) {
 
             Logger.Log(this, "Exploding my teleporter");
@@ -492,7 +513,27 @@ public class Asteroid implements INeighbour {
         SunController.GetInstance().RemoveAsteroid(this);
         Logger.Return();
 
+        Logger.Log(this, "Removing me from InputOutputController");
+        NeighbourBaseRepository.GetInstance().Remove(id);
         Logger.Return();
+
+        if (resource != null) {
+            resource.ReactToHomeDestroyed();
+        }
+
+        Logger.Return();
+    }
+
+    /**
+     * ELtávolít egy aszteroidát ennek a szomszédságából
+     * @param asteroid az eltávolítandó aszteroida
+     * */
+    public void RemoveNeighbouringAsteroid(Asteroid asteroid) {
+
+        Logger.Log(this, "Removing nehgbouring asteroid");
+        neighbouringAsteroids.remove(asteroid);
+        Logger.Return();
+
     }
 
     /**
