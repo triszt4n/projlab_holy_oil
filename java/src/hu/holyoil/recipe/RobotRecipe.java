@@ -82,6 +82,8 @@ public class RobotRecipe implements IRecipe {
             Robot robot = new Robot(asteroid);
             Logger.RegisterObject(robot, "r: Robot");
 
+            iStorageCapable.ReactToMoveMade();
+
         }
 
         ResourceBaseRepository.GetInstance().Remove(iron.GetId());

@@ -77,7 +77,7 @@ public class Uranium extends AbstractBaseResource {
         if(health <= 0) {
             asteroid.Explode();
         }
-        
+
         Logger.Return();
     }
 }
