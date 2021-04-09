@@ -2,6 +2,7 @@ package hu.holyoil.controller;
 
 import hu.holyoil.IIdentifiable;
 import hu.holyoil.Main;
+import hu.holyoil.commandhandler.addneighbourcommand.AddNeighbourCommandHandler;
 import hu.holyoil.commandhandler.docommand.DoCommandHandler;
 import hu.holyoil.commandhandler.explodeasteroidcommand.ExplodeAsteroidCommandHandler;
 import hu.holyoil.repository.NeighbourBaseRepository;
@@ -71,8 +72,8 @@ public class InputOutputController {
                 // todo: handle creation logic
                 break;
             }
-            case "addneighbour": {
-                // todo: handle neighbour add logic
+            case "add_neighbour": {
+                new AddNeighbourCommandHandler().Handle(line);
                 break;
             }
             case "step": {
