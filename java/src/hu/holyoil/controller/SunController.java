@@ -1,6 +1,7 @@
 package hu.holyoil.controller;
 
 import hu.holyoil.IIdentifiable;
+import hu.holyoil.Main;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.skeleton.Logger;
 
@@ -38,18 +39,43 @@ public class SunController implements ISteppable, IIdentifiable {
      * Pseudo random szám, ami a következő napviharig hátralévő köröket számolja
      * <p>körönként csökken,napvihar után újra sorsolódik</p>
      */
-    private Integer turnsUntilNextSunstorm;
+    private int turnsUntilNextSunstorm;
     /**
      * A pályán található összes aszteroidát tartalmazó lista
      */
     private List<Asteroid> asteroids;
 
     /**
-     * minden körben végrehajt egy lépést
+     * Újraindítja a visszaszámláló turnsUntilNextSunstorm számlálót egy random számra 20 és 50 között
+     * Random kikapcsolásával 30-ra állítódik.
+     */
+    private void RestartCountdown() {
+        Logger.Log(this, "Restarting sunstorm countdown" + (Main.isRandomEnabled ? "" : " - non-randomly!"));
+        Logger.Return();
+
+        if (!Main.isRandomEnabled) {
+            turnsUntilNextSunstorm = 30;
+            return;
+        }
+
+        Random random = new Random();
+        turnsUntilNextSunstorm = random.nextInt(50 - 20 + 1) + 20;
+    }
+
+    /**
+     * Minden körben végrehajt egy lépést
      */
     @Override
     public void Step() {
-        System.out.println("Stepping");
+        Logger.Log(this, "Steps");
+
+        --turnsUntilNextSunstorm;
+        if (turnsUntilNextSunstorm == 0) {
+            StartSunstorm();
+            RestartCountdown();
+        }
+
+        Logger.Return();
     }
 
     /**
@@ -137,7 +163,7 @@ public class SunController implements ISteppable, IIdentifiable {
      * Inicializálja az aszteroidáka tároló listát.</p>
      */
     private SunController() {
-        turnsUntilNextSunstorm = 100;
+        RestartCountdown();
         asteroids = new ArrayList<>();
         id = "SunController";
     }

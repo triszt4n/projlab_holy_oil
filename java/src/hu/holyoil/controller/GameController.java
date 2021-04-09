@@ -32,8 +32,15 @@ public class GameController implements ISteppable  {
      */
     @Override
     public void Step() {
-        System.out.println("Stepping");
+        Logger.Log(this, "Steps");
+
+        CheckWinCondition();
+        CheckLoseCondition();
+        CheckGameCondition();
+
         TurnController.GetInstance().ResetMoves();
+
+        Logger.Return();
     }
 
     /**
