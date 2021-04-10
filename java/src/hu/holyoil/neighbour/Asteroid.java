@@ -586,4 +586,12 @@ public class Asteroid implements INeighbour {
 
     }
 
+    /**
+     * Visszadja az átfúratlan rétegek számát
+     * @return az átfúratlan rétegek száma
+     */
+    public int GetLayerCount(){
+        return numOfLayersRemaining;
+    }
+
 }
