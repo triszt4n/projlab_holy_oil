@@ -28,7 +28,7 @@ public class Settler extends AbstractCrewmate implements IStorageCapable, IMiner
      * */
     @Override
     public String toString() {
-        return "SETTLER (name:)" + id + " (asteroid name:)" + onAsteroid.GetId() + " (storage name:)" + storage.GetId();
+        return "SETTLER (name:) " + id + "\n\t(asteroid name:) " + onAsteroid.GetId() + "\n\t(storage name:) " + storage.GetId();
     }
 
     /**
@@ -47,18 +47,18 @@ public class Settler extends AbstractCrewmate implements IStorageCapable, IMiner
     }
 
     public Settler(Asteroid asteroid, String name, String storageName) {
-
         id = name;
         if (storageName == null) {
             storage = new PlayerStorage();
-        } else {
+        }
+        else {
             storage = new PlayerStorage(storageName);
         }
         onAsteroid = asteroid;
-        onAsteroid.AddSpaceship(this);
+
         SpaceshipBaseRepository.GetInstance().Add(name, this);
         TurnController.GetInstance().RegisterEntityWithAction(this);
-
+        onAsteroid.AddSpaceship(this);
     }
 
 

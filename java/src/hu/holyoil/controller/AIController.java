@@ -108,10 +108,8 @@ public class AIController implements ISteppable {
     public void HandleRobot(Robot robot)  {
         Logger.Log(this,"Handle robot <" +  Logger.GetName(robot)+ ">");
 
-        if (!Main.isRandomEnabled)
-            return;
-
-        robot.Move(robot.GetOnAsteroid().GetRandomNeighbour());
+        if (Main.isRandomEnabled)
+            robot.Move(robot.GetOnAsteroid().GetRandomNeighbour());
 
         // todo: proper intelligence
         Logger.Return();
@@ -123,10 +121,8 @@ public class AIController implements ISteppable {
     public void HandleUfo(Ufo ufo)  {
         Logger.Log(this,"Handle ufo <" +  Logger.GetName(ufo)+ ">");
 
-        if (!Main.isRandomEnabled)
-            return;
-
-        ufo.Move(ufo.GetOnAsteroid().GetRandomNeighbour());
+        if (Main.isRandomEnabled)
+            ufo.Move(ufo.GetOnAsteroid().GetRandomNeighbour());
 
         // todo: proper intelligence
         Logger.Return();
@@ -139,10 +135,8 @@ public class AIController implements ISteppable {
         Logger.Log(this,"Handle teleporter <" +  Logger.GetName(teleportGate)+ ">");
         // todo
 
-        if (!Main.isRandomEnabled)
-            return;
-
-        teleportGate.Move((Asteroid)teleportGate.GetHomeAsteroid().GetRandomNeighbour()); // safety? we know it's an asteroid
+        if (Main.isRandomEnabled)
+            teleportGate.Move((Asteroid)teleportGate.GetHomeAsteroid().GetRandomNeighbour()); // safety? we know it's an asteroid
 
         // todo: proper intelligence
         // nice idea for this logic

@@ -13,6 +13,7 @@ import hu.holyoil.repository.NeighbourBaseRepository;
 import hu.holyoil.repository.PlayerStorageBaseRepository;
 import hu.holyoil.repository.ResourceBaseRepository;
 import hu.holyoil.repository.SpaceshipBaseRepository;
+import hu.holyoil.skeleton.Logger;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,6 +28,10 @@ public class InputOutputController {
             inputOutputController = new InputOutputController();
         }
 
+        if (Logger.GetName(inputOutputController) == null) {
+            Logger.RegisterObject(inputOutputController, ": InputOutputController");
+        }
+
         return inputOutputController;
     }
 
@@ -34,7 +39,7 @@ public class InputOutputController {
         Scanner scanner = new Scanner(inputStream);
         boolean isRunning = true;
 
-        while (scanner.hasNextLine() && isRunning) {
+        while (isRunning && scanner.hasNextLine()) {
             String line = scanner.nextLine();
 
             if (line.length() <= 0) {
@@ -43,6 +48,18 @@ public class InputOutputController {
 
             String[] command = line.split(" ");
             switch (command[0]) {
+                case "echo_off": {
+                    Logger.SetEnabled(false);
+                    break;
+                }
+                case "echo_on": {
+                    Logger.SetEnabled(true);
+                    break;
+                }
+                case "do": {
+                    isRunning = new DoCommandHandler().Handle(line);
+                    break;
+                }
                 case "create": {
                     isRunning = new CreateCommandHandler().Handle(line);
                     break;
@@ -74,17 +91,18 @@ public class InputOutputController {
                     break;
                 }
                 case "state": {
+                    boolean temp = Logger.IsEnabled();
+                    Logger.SetEnabled(true);
                     isRunning = new StateCommandHandler().Handle(line);
+                    Logger.SetEnabled(temp);
                     break;
                 }
                 case "exit": {
-                    System.out.println("Closing application");
                     isRunning = false;
                     break;
                 }
                 default: {
                     System.out.println("Command not recognized: " + line.split(" ")[0]);
-                    System.out.println("Closing application");
                     isRunning = false;
                     break;
                 }

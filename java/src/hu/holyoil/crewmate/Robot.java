@@ -19,7 +19,7 @@ public class Robot extends AbstractCrewmate {
      * */
     @Override
     public String toString() {
-        return "ROBOT (name:)" + id + " (asteroid name:)" + onAsteroid.GetId();
+        return "ROBOT (name:) " + id + "\n\t(asteroid name:) " + onAsteroid.GetId();
     }
 
     /**
@@ -37,9 +37,10 @@ public class Robot extends AbstractCrewmate {
     public Robot(Asteroid asteroid, String name) {
         id = name;
         onAsteroid = asteroid;
-        AIController.GetInstance().AddRobot(this);
+
         SpaceshipBaseRepository.GetInstance().Add(name, this);
         TurnController.GetInstance().RegisterEntityWithAction(this);
+        AIController.GetInstance().AddRobot(this);
         onAsteroid.AddSpaceship(this);
     }
 

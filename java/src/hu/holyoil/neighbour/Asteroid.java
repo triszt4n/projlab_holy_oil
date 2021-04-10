@@ -55,6 +55,8 @@ public class Asteroid implements INeighbour {
         numOfLayersRemaining = 0;
         id = name;
         NeighbourBaseRepository.GetInstance().Add(name, this);
+        GameController.GetInstance().AddAsteroid(this);
+        SunController.GetInstance().AddAsteroid(this);
 
     }
 
@@ -63,21 +65,21 @@ public class Asteroid implements INeighbour {
      * */
     @Override
     public String toString() {
-        StringBuilder toReturn = new StringBuilder("ASTEROID (name:)" + id
-                + " (is near sun:)" + isNearSun
-                + " (layers left:)" + numOfLayersRemaining
-                + " (is discovered:)" + isDiscovered
-                + " (resource name:)" + (resource == null ? "null" : resource.GetId())
-                + " (teleporter name:)" + (teleporter == null ? "null" : teleporter.GetId()));
+        StringBuilder toReturn = new StringBuilder("ASTEROID (name:) " + id
+                + "\n\t(is near sun:) " + isNearSun
+                + "\n\t(layers left:) " + numOfLayersRemaining
+                + "\n\t(is discovered:) " + isDiscovered
+                + "\n\t(resource name:) " + (resource == null ? "null" : resource.GetId())
+                + "\n\t(teleporter name:) " + (teleporter == null ? "null" : teleporter.GetId()));
 
-        toReturn.append(" (spaceship names:)[");
+        toReturn.append("\n\t(spaceship names:) [");
         for (int i = 0; i < spaceships.size(); i++) {
             toReturn.append(spaceships.get(i).GetId());
             if (i != spaceships.size() - 1) {
                 toReturn.append(" ");
             }
         }
-        toReturn.append("] (neighbour asteroid names:)[");
+        toReturn.append("]\n\t(neighbour asteroid names:) [");
         for (int i = 0; i < neighbouringAsteroids.size(); i++) {
             toReturn.append(neighbouringAsteroids.get(i).GetId());
             if (i != neighbouringAsteroids.size() - 1) {
@@ -424,12 +426,12 @@ public class Asteroid implements INeighbour {
     public void AddNeighbourAsteroid(Asteroid asteroid) {
 
         if (neighbouringAsteroids.contains(asteroid)) {
-            Logger.Log(this, "Asteroid " + asteroid + " already my neighbour");
+            Logger.Log(this, "Asteroid " + Logger.GetName(asteroid) + " already my neighbour");
             Logger.Return();
             return;
         }
 
-        Logger.Log(this, "Adding asteroid " + asteroid + " to my neighbours");
+        Logger.Log(this, "Adding asteroid " + Logger.GetName(asteroid) + " to my neighbours");
         neighbouringAsteroids.add(asteroid);
         Logger.Return();
 
