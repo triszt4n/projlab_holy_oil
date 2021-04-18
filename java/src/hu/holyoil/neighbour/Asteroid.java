@@ -146,7 +146,7 @@ public class Asteroid implements INeighbour {
 
     /**
      * Mozgatja a kapott teleportert erre az aszteroidára.
-     * @param comingTeleporter ide a mozgást elvégezni készülő Spaceship
+     * @param comingTeleporter az ide mozgást elvégezni készülő teleporter
      */
     public void ReactToMove(TeleportGate comingTeleporter){
         Logger.Log(this, "Reacting to coming teleporter: " + Logger.GetName(comingTeleporter));
@@ -193,6 +193,16 @@ public class Asteroid implements INeighbour {
         isNearSun = newIsNearbySun;
         Logger.Return();
 
+    }
+
+    /**
+     * Visszaadja napközeli-e az aszteroida
+     * @return boolean, true: napközeli, false: nem napközeli
+     */
+    public boolean GetIsNearbySun(){
+        Logger.Log(this, "isNearbySun: " + isNearSun.toString());
+        Logger.Return();
+        return isNearSun;
     }
 
     /**
@@ -356,6 +366,8 @@ public class Asteroid implements INeighbour {
         Logger.Return();
     }
 
+
+
     /**
      * Visszaad egy véletlen szomszédot.
      * <p>
@@ -391,7 +403,6 @@ public class Asteroid implements INeighbour {
                 return neighbouringAsteroids.get(0);
         }
         else {
-
             Random random = new Random();
             boolean canChooseTeleporter = false;
             if (teleporter != null) {
@@ -400,8 +411,7 @@ public class Asteroid implements INeighbour {
                 }
             }
 
-            int chosenIndex = random.nextInt() %
-                    (neighbouringAsteroids.size() + (canChooseTeleporter ? 0 : 1));
+            int chosenIndex = random.nextInt((neighbouringAsteroids.size() + (canChooseTeleporter ? 1 : 0)));
 
             return chosenIndex == neighbouringAsteroids.size() ?
                     teleporter :
@@ -573,6 +583,10 @@ public class Asteroid implements INeighbour {
 
     }
 
+    /**
+     * Beállítja az új felfedezettséget
+     * @param newIsDiscovered az isDiscovered új értéke
+     */
     public void SetIsDiscovered(Boolean newIsDiscovered) {
 
         isDiscovered = newIsDiscovered;
