@@ -1,21 +1,41 @@
 package hu.holyoil.controller;
 
 import hu.holyoil.Main;
+import hu.holyoil.commandhandler.Logger;
 import hu.holyoil.commandhandler.addneighbourcommand.AddNeighbourCommandHandler;
-import hu.holyoil.commandhandler.createcommand.CreateCommandHandler;
 import hu.holyoil.commandhandler.causesunstormcommand.CauseSunstormCommandHandler;
+import hu.holyoil.commandhandler.createcommand.CreateCommandHandler;
 import hu.holyoil.commandhandler.docommand.DoCommandHandler;
+import hu.holyoil.commandhandler.explodeasteroidcommand.ExplodeAsteroidCommandHandler;
 import hu.holyoil.commandhandler.loadcommand.LoadCommandHandler;
 import hu.holyoil.commandhandler.statecommand.StateCommandHandler;
-import hu.holyoil.commandhandler.explodeasteroidcommand.ExplodeAsteroidCommandHandler;
-import hu.holyoil.commandhandler.Logger;
+import sun.rmi.runtime.Log;
 
 import java.io.InputStream;
-import java.util.Scanner;
+import java.util.*;
 
 public class InputOutputController {
 
     private static InputOutputController inputOutputController;
+    private static List<String> commands = Arrays.asList("echo_off", "echo_on", "do",
+            "create", "load", "add_neighbour",
+            "step", "cause_sunstorm", "explode_asteroid", "disable_random", "state", "exit", "play", "generate");
+
+    private static int Distance(String a, String b) {
+        int[][] d = new int[a.length() + 1][b.length() + 1];
+        for (int i = 0; i < a.length() + 1; i++) {
+            for (int j = 0; j < b.length() + 1; j++) {
+                if (i == 0) d[0][j] = j;
+                else if (j == 0) d[i][0] = i;
+                else
+                    d[i][j] = Collections.min(Arrays.asList(
+                            d[i - 1][j] + 1,
+                            d[i][j - 1] + 1,
+                            d[i - 1][j - 1] + (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1)));
+            }
+        }
+        return d[a.length()][b.length()];
+    }
 
     public static InputOutputController GetInstance() {
         if (inputOutputController == null) {
@@ -32,9 +52,11 @@ public class InputOutputController {
     public void ParseCommand(InputStream inputStream) {
         Scanner scanner = new Scanner(inputStream);
         boolean isRunning = true;
+        boolean isPlayMode = false;
 
         while (isRunning && scanner.hasNextLine()) {
             String line = scanner.nextLine();
+            boolean commandSuccess = true;
 
             if (line.length() <= 0) {
                 continue;
@@ -51,19 +73,19 @@ public class InputOutputController {
                     break;
                 }
                 case "do": {
-                    isRunning = new DoCommandHandler().Handle(line);
+                    commandSuccess = new DoCommandHandler().Handle(line);
                     break;
                 }
                 case "create": {
-                    isRunning = new CreateCommandHandler().Handle(line);
+                    commandSuccess = new CreateCommandHandler().Handle(line);
                     break;
                 }
                 case "load": {
-                    isRunning = new LoadCommandHandler().Handle(line);
+                    commandSuccess = new LoadCommandHandler().Handle(line);
                     break;
                 }
                 case "add_neighbour": {
-                    isRunning = new AddNeighbourCommandHandler().Handle(line);
+                    commandSuccess = new AddNeighbourCommandHandler().Handle(line);
                     break;
                 }
                 case "step": {
@@ -73,11 +95,11 @@ public class InputOutputController {
                     break;
                 }
                 case "cause_sunstorm": {
-                    isRunning = new CauseSunstormCommandHandler().Handle(line);
+                    commandSuccess = new CauseSunstormCommandHandler().Handle(line);
                     break;
                 }
                 case "explode_asteroid": {
-                    isRunning = new ExplodeAsteroidCommandHandler().Handle(line);
+                    commandSuccess = new ExplodeAsteroidCommandHandler().Handle(line);
                     break;
                 }
                 case "disable_random": {
@@ -88,7 +110,7 @@ public class InputOutputController {
                 case "state": {
                     boolean temp = Logger.IsEnabled();
                     Logger.SetEnabled(true);
-                    isRunning = new StateCommandHandler().Handle(line);
+                    commandSuccess = new StateCommandHandler().Handle(line);
                     Logger.SetEnabled(temp);
                     break;
                 }
@@ -96,10 +118,34 @@ public class InputOutputController {
                     isRunning = false;
                     break;
                 }
+                case "play": {
+                    isPlayMode = true;
+                    Logger.SetEnabled(false);
+                    break;
+                }
+                case  "generate": {
+                    boolean temp = Logger.IsEnabled();
+                    Logger.SetEnabled(false);
+                    GameController.GetInstance().StartGame();
+                    Logger.SetEnabled(temp);
+                    break;
+                }
                 default: {
+                    commandSuccess = false;
+                    break;
+                }
+            }
+            //handle unsuccessful command
+            if(!commandSuccess){
+                if (isPlayMode) {
+                    // play mode -> suggest similar available command
+                    System.out.println("Command not recognised.");
+                    String closest = Collections.min(commands, Comparator.comparingInt(s -> Distance(s, line)));
+                    System.out.println("\t Did you mean: " + closest + " ?");
+                } else {
+                    // not in playmode -> exit with errror message.
                     System.out.println("Command not recognized: " + line.split(" ")[0]);
                     isRunning = false;
-                    break;
                 }
             }
         }
