@@ -7,16 +7,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class MenuFrame extends JFrame {
     private JButton playBtn;
     private JSlider slider;
-    private int playerCount = 1;
+    private int playerCount = 2;
 
     private void InitComponents() {
         // setting background
@@ -46,7 +41,7 @@ public class MenuFrame extends JFrame {
         JLabel sliderLabel = new JLabel("Number of players:");
         sliderLabel.setForeground(Color.white);
 
-        slider = new JSlider(JSlider.HORIZONTAL, 1, TurnController.GetInstance().NUM_OF_PLAYERS_MAX, 1);
+        slider = new JSlider(JSlider.HORIZONTAL, 2, TurnController.GetInstance().NUM_OF_PLAYERS_MAX, 2);
         slider.setMajorTickSpacing(1);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);

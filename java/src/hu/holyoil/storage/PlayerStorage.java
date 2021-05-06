@@ -27,7 +27,6 @@ public class PlayerStorage implements IIdentifiable {
         teleporters = new ArrayList<>();
         id = name;
         PlayerStorageBaseRepository.GetInstance().Add(name, this);
-
     }
 
     /**

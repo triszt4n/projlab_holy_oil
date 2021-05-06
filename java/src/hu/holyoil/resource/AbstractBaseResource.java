@@ -2,12 +2,14 @@ package hu.holyoil.resource;
 
 import hu.holyoil.IIdentifiable;
 import hu.holyoil.collection.BillOfMaterial;
-import hu.holyoil.commandhandler.Logger;
+import hu.holyoil.controller.Logger;
 import hu.holyoil.crewmate.IMiner;
 import hu.holyoil.crewmate.IStorageCapable;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.repository.ResourceBaseRepository;
 import hu.holyoil.storage.PlayerStorage;
+
+import java.awt.*;
 
 /**
  * A nyersanyagokat általánosító absztrakt osztály.
@@ -39,7 +41,7 @@ public abstract class AbstractBaseResource implements IIdentifiable {
         asteroid.SetResource(null);
         iMiner.ReactToMoveMade();
         ReactToGettingDestroyed();
-        Logger.Log(this,"got mined by a ufo");
+        Logger.Log(iMiner,"I've mined " + this + " of " + asteroid.GetId());
     }
 
     /**
@@ -104,4 +106,9 @@ public abstract class AbstractBaseResource implements IIdentifiable {
     public void ReactToGettingDestroyed() {
         ResourceBaseRepository.GetInstance().Remove(id);
     }
+
+    /**
+     * Visszaadja az ikonját
+     */
+    public abstract Image GetImage();
 }

@@ -1,7 +1,6 @@
 package hu.holyoil.controller;
 
 import hu.holyoil.IIdentifiable;
-import hu.holyoil.Main;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.repository.AsteroidRepository;
 
@@ -46,18 +45,8 @@ public class SunController implements ISteppable, IIdentifiable {
      * Random kikapcsolásával 30-ra állítódik.
      */
     private void RestartCountdown() {
-
-        if (!Main.isRandomEnabled) {
-            turnsUntilNextSunstorm = 30;
-            return;
-        }
-
         Random random = new Random();
         turnsUntilNextSunstorm = random.nextInt(50 - 20 + 1) + 20;
-    }
-
-    public void SetCountdown(int newCountdown) {
-        turnsUntilNextSunstorm = newCountdown;
     }
 
     /**
@@ -70,9 +59,23 @@ public class SunController implements ISteppable, IIdentifiable {
             StartSunstorm();
             RestartCountdown();
         }
-
+        if(turnsUntilNextSunstorm<=3){
+            Logger.Log(this, "Sunstorm in " + turnsUntilNextSunstorm + " turn(s)");
+        }
+        PullAsteroids();
         List<Asteroid> asteroidsShallowCopy = new ArrayList<>(AsteroidRepository.GetInstance().GetAll());
         asteroidsShallowCopy.forEach(Asteroid::ReactToSunNearby);
+    }
+
+    /**
+     * 15% valószínűséggel napközelbe helyez minden aszteroidát.
+     */
+    public void PullAsteroids(){
+        List<Asteroid> asteroids = AsteroidRepository.GetInstance().GetAll();
+        Random random = new Random();
+        asteroids.forEach(asteroid -> {
+            asteroid.SetIsNearbySun(random.nextDouble() < 0.15);
+        });
     }
 
     /**
@@ -91,7 +94,7 @@ public class SunController implements ISteppable, IIdentifiable {
         traversingQueue.add(startingAsteroid);
         chosenAsteroids.add(startingAsteroid);
 
-        while (chosenAsteroids.size() < asteroids.size() / 3 && !traversingQueue.isEmpty()) {
+        while (chosenAsteroids.size() < asteroids.size() / 2 && !traversingQueue.isEmpty()) {
             Asteroid currentAsteroid = traversingQueue.remove();
 
             List<Asteroid> untraversedNeighbours = currentAsteroid.GetNeighbours()
@@ -102,7 +105,7 @@ public class SunController implements ISteppable, IIdentifiable {
             traversingQueue.addAll(untraversedNeighbours);
 
             for (Asteroid item : untraversedNeighbours) {
-                if (chosenAsteroids.size() < asteroids.size() / 3)
+                if (chosenAsteroids.size() < asteroids.size() / 2)
                     chosenAsteroids.add(item);
                 else
                     break;
@@ -129,6 +132,7 @@ public class SunController implements ISteppable, IIdentifiable {
 
         if (sunController == null) {
             sunController = new SunController();
+            Logger.RegisterObject(sunController, sunController.id);
         }
 
         return sunController;
@@ -143,7 +147,7 @@ public class SunController implements ISteppable, IIdentifiable {
      */
     private SunController() {
         RestartCountdown();
-        id = "SunController";
+        id = "Sun";
     }
 
 }

@@ -2,14 +2,10 @@ package hu.holyoil.view.popupmenus;
 
 import hu.holyoil.controller.TurnController;
 import hu.holyoil.crewmate.AbstractSpaceship;
-import hu.holyoil.crewmate.Settler;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.neighbour.TeleportGate;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 /**
@@ -40,33 +36,38 @@ public class TeleportGatePopupMenu extends AbstractPopupMenu {
 
         //létrehozzuk a kiírandó stringeket
         String crazyString = "Crazy?: " + teleportGate.GetIsCrazy();
-        String idString = " ID: " + asteroid.GetId();
-        String coreString;
-        if(asteroid.GetResource() != null) {
-            coreString = " Core: " + asteroid.GetResource().toString();
-        }else{
-            coreString = " Core: ";
-        }
-        String layersString = " Layers: " + asteroid.GetLayerCount();
-        StringBuilder shipsString = new StringBuilder(" Ships: ");
-        for (AbstractSpaceship sp : asteroid.GetSpaceships()) {
-            shipsString.append(" ").append(sp.GetId());
-        }
-        String nearSunString = " NearSun?: ";
-        if (asteroid.GetIsNearbySun()) {
-            nearSunString += "true";
-        } else {
-            nearSunString += "false";
-        }
-
         //hozzáadjuk a stringeket a popupmenu-höz
         this.add(crazyString);
-        this.add("To asteroid:");
-        this.add(idString);
-        this.add(coreString);
-        this.add(layersString);
-        this.add(shipsString.toString());
-        this.add(nearSunString);
+
+        if (asteroid!=null) {
+            this.add("To asteroid:");
+            String idString = " ID: " + asteroid.GetId();
+            String coreString;
+            if (asteroid.GetResource() != null) {
+                coreString = " Core: " + asteroid.GetResource().toString();
+            } else {
+                coreString = " Core: ";
+            }
+            String layersString = " Layers: " + asteroid.GetLayerCount();
+            StringBuilder shipsString = new StringBuilder(" Ships: ");
+            for (AbstractSpaceship sp : asteroid.GetSpaceships()) {
+                shipsString.append(" ").append(sp.GetId());
+            }
+            String nearSunString = " NearSun?: ";
+            if (asteroid.GetIsNearbySun()) {
+                nearSunString += "true";
+            } else {
+                nearSunString += "false";
+            }
+            this.add(idString);
+            this.add(coreString);
+            this.add(layersString);
+            this.add(shipsString.toString());
+            this.add(nearSunString);
+        }
+
+
+
     }
 
     /**
@@ -79,5 +80,6 @@ public class TeleportGatePopupMenu extends AbstractPopupMenu {
         JMenuItem travel = new JMenuItem("travel here");
         travel.addActionListener(e -> TurnController.GetInstance().GetSteppingSettler().Move(teleporter));
         this.add(travel);
+        travel.setEnabled(teleporter.GetPair().GetHomeAsteroid() != null);
     }
 }

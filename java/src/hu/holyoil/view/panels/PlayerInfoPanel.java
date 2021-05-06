@@ -7,8 +7,7 @@ import java.awt.*;
 public class PlayerInfoPanel extends JPanel {
 
     private static final ImageIcon imgDead = new ImageIcon("assets/dead.gif");
-    private static final Color normalColor = new Color(4, 4, 13);
-    private static final Color activeColor = new Color(44, 123, 23);
+    private static final ImageIcon imgSettler = new ImageIcon("assets/settler.gif");
     private JLabel playerName;
     private JLabel playerAsteroid;
     private JLabel playerState;
@@ -16,17 +15,25 @@ public class PlayerInfoPanel extends JPanel {
         super();
         initComponents();
         setPlayerState(PlayerState.Dead);
-        setPreferredSize(new Dimension(360, 50));
-        setMaximumSize(new Dimension(360, 50));
-        setBackground(normalColor);
+        setPreferredSize(new Dimension(360, 45));
+        setMaximumSize(new Dimension(360, 45));
+        setOpaque(false);
     }
 
     private void initComponents() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 30, 5));
+        FlowLayout flow = new FlowLayout(FlowLayout.LEFT, 30, 5);
+        setLayout(flow);
         playerName = new JLabel();
+        playerName.setForeground(Color.WHITE);
+        playerName.setVerticalAlignment(JLabel.CENTER);
+        playerName.setHorizontalAlignment(JLabel.RIGHT);
+        playerName.setPreferredSize(new Dimension(80, 45));
         playerAsteroid = new JLabel();
+        playerAsteroid.setForeground(Color.WHITE);
+        playerAsteroid.setVerticalAlignment(JLabel.CENTER);
+        playerAsteroid.setPreferredSize(new Dimension(80, 45));
         playerState = new JLabel();
-
+        playerState.setPreferredSize(new Dimension(50, 45));
 
         add(playerAsteroid);
         add(playerName);
@@ -44,16 +51,15 @@ public class PlayerInfoPanel extends JPanel {
     public void setPlayerState(PlayerState state) {
         switch (state) {
             case Active:
-                playerState.setIcon(null);
-                setBackground(activeColor);
+                playerState.setIcon(imgSettler);
                 break;
             case Waiting:
                 playerState.setIcon(null);
-                setBackground(normalColor);
+                setOpaque(false);
                 break;
             case Dead:
                 playerState.setIcon(imgDead);
-                setBackground(normalColor);
+                setOpaque(false);
                 break;
         }
     }

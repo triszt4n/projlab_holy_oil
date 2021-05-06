@@ -1,13 +1,13 @@
 package hu.holyoil.crewmate;
 
-import hu.holyoil.commandhandler.Logger;
 import hu.holyoil.controller.AIController;
+import hu.holyoil.controller.Logger;
 import hu.holyoil.controller.TurnController;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.repository.SpaceshipBaseRepository;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Robotot leíró osztály.
@@ -62,9 +62,6 @@ public class Robot extends AbstractCrewmate {
         TurnController.GetInstance().RemoveEntityWithAction(this);
 
         SpaceshipBaseRepository.GetInstance().Remove(id);
-
-        Logger.Return();
-
     }
 
     /**
@@ -74,6 +71,14 @@ public class Robot extends AbstractCrewmate {
     @Override
     public void ReactToAsteroidExplosion() {
         onAsteroid.GetRandomNeighbour().ReactToMove(onAsteroid, this);
+    }
+
+    @Override
+    public void Drill() {
+        super.Drill();
+        if (onAsteroid.GetLayerCount() == 0 && onAsteroid.GetResource() != null) {
+            Logger.Log(this, "I've revealed some " + onAsteroid.GetResource().toString() + " on " + onAsteroid.GetId());
+        }
     }
 
     /**

@@ -1,12 +1,9 @@
 package hu.holyoil.controller;
 
-import hu.holyoil.Main;
 import hu.holyoil.crewmate.Settler;
 import hu.holyoil.crewmate.Ufo;
 import hu.holyoil.neighbour.Asteroid;
-import hu.holyoil.repository.AsteroidRepository;
-import hu.holyoil.repository.ResourceBaseRepository;
-import hu.holyoil.repository.SettlerRepository;
+import hu.holyoil.repository.*;
 import hu.holyoil.resource.*;
 import hu.holyoil.view.frames.GameFrame;
 import hu.holyoil.view.frames.MenuFrame;
@@ -159,6 +156,27 @@ public class GameController implements ISteppable  {
     }
 
     /**
+     * Törli az összes objektumot a tárolókból, felkészülve egy friss játékra.
+     */
+    private void ResetGame(){
+        //GC should manage these old objects, once we remove the references
+        NeighbourBaseRepository.GetInstance().Clear();
+        SpaceshipBaseRepository.GetInstance().Clear();
+        PlayerStorageBaseRepository.GetInstance().Clear();
+        ResourceBaseRepository.GetInstance().Clear();
+        AIController.GetInstance().ResetAI();
+        gameState=GameState.RUNNING;
+    }
+
+    /**
+     * Leállítja a játékmenetet.
+     */
+    public void CloseGame() {
+        TurnController.GetInstance().GetGameFrame().setVisible(false);
+        GameController.GetInstance().StartApp();
+    }
+
+    /**
      * Elindított alkalmazás menü ablaka.
      */
     private final MenuFrame menu = new MenuFrame();
@@ -182,12 +200,11 @@ public class GameController implements ISteppable  {
      * @param numOfPlayers A játékban lévő játékosok száma
      */
     public void StartGame(int numOfPlayers)  {
+        ResetGame();
+
         // Generate between minAsteroidCount and maxAsteroidCount asteroids
         Random random = new Random();
-        int numOfAsteroids = minAsteroidCount;
-        if (Main.isRandomEnabled) {
-            numOfAsteroids += random.nextInt(maxAsteroidCount - minAsteroidCount + 1);
-        }
+        int numOfAsteroids = minAsteroidCount + random.nextInt(maxAsteroidCount - minAsteroidCount + 1);
 
         String startingAsteroidName = null;
         String ufoStartingAsteroidName = null;
@@ -203,36 +220,15 @@ public class GameController implements ISteppable  {
             // ufos start at the last asteroid
             ufoStartingAsteroidName = asteroid.GetId();
 
-            // this looked ugly in "one" line.
-            if (Main.isRandomEnabled) {
-
-                asteroid.SetNumOfLayersRemaining(
-                        random.nextInt(maxLayerCount - minLayerCount) + minLayerCount
-                );
-
-            } else {
-
-                asteroid.SetNumOfLayersRemaining(
-                        (i % (maxLayerCount - minLayerCount + 1)) + minLayerCount
-                );
-
-            }
+            asteroid.SetNumOfLayersRemaining(
+                    random.nextInt(maxLayerCount - minLayerCount) + minLayerCount
+            );
 
             asteroid.SetIsDiscovered(false);
             int generatedResource;
 
-            if (Main.isRandomEnabled) {
-
-                // We generate a resource. There are 4 resources, 0 means no resource.
-                generatedResource = random.nextInt(5);
-
-            } else {
-
-                // With layers being between 3-5, and this being between 0-4, their smallest common divisor is 1.
-                // Meaning that they will generate every combination of layercount and resource.
-                generatedResource = i % 5;
-
-            }
+            // We generate a resource. There are 4 resources, 0 means no resource.
+            generatedResource = random.nextInt(5);
             AbstractBaseResource resource = null;
 
             switch (generatedResource) {
@@ -274,37 +270,13 @@ public class GameController implements ISteppable  {
 
             for (int i = 0; i < asteroidNames.size(); i++) {
 
-                if (Main.isRandomEnabled) {
+                for (int j = 0; j < asteroidNames.size(); j++) {
 
-                    for (int j = 0; j < asteroidNames.size(); j++) {
-
-                        if (i == j) {
-                            break;
-                        }
-
-                        if (random.nextInt(100) < chanceOfNeighbours) {
-
-                            AsteroidRepository.GetInstance().Get(asteroidNames.get(i)).AddNeighbourAsteroid(
-                                    AsteroidRepository.GetInstance().Get(asteroidNames.get(j))
-                            );
-                            AsteroidRepository.GetInstance().Get(asteroidNames.get(j)).AddNeighbourAsteroid(
-                                    AsteroidRepository.GetInstance().Get(asteroidNames.get(i))
-                            );
-
-                        }
-
+                    if (i == j) {
+                        break;
                     }
 
-                } else {
-
-                    int j = i + 1;
-                    // if [j] would be out of bounds, we set it to 0
-                    if (j == asteroidNames.size()) {
-                        j = 0;
-                    }
-
-                    // we add chanceOfNeighbours amount of neighbours to every asteroid
-                    while (j <= chanceOfNeighbours + i) {
+                    if (random.nextInt(100) < chanceOfNeighbours) {
 
                         AsteroidRepository.GetInstance().Get(asteroidNames.get(i)).AddNeighbourAsteroid(
                                 AsteroidRepository.GetInstance().Get(asteroidNames.get(j))
@@ -312,12 +284,6 @@ public class GameController implements ISteppable  {
                         AsteroidRepository.GetInstance().Get(asteroidNames.get(j)).AddNeighbourAsteroid(
                                 AsteroidRepository.GetInstance().Get(asteroidNames.get(i))
                         );
-
-                        j++;
-                        // if [j] would be out of bounds, we set it to 0
-                        if (j == asteroidNames.size()) {
-                            j = 0;
-                        }
 
                     }
 
@@ -355,12 +321,18 @@ public class GameController implements ISteppable  {
 
         }
 
+        Asteroid startingAsteroid = AsteroidRepository.GetInstance().Get(startingAsteroidName);
         for (int i = 0; i < numOfPlayers; i++) {
 
             // We generate numOfPlayers amount of settlers on the settler asteroid
-            new Settler(
-                    AsteroidRepository.GetInstance().Get(startingAsteroidName)
-            );
+            new Settler(startingAsteroid);
+
+        }
+
+        for(Asteroid asteroid : startingAsteroid.GetNeighbours()){
+
+            //Little advantage for players: we discover all neighbours of the starting asteroid
+            asteroid.Discover();
 
         }
 

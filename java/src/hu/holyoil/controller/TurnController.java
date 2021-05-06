@@ -107,7 +107,8 @@ public class TurnController {
             AIController.GetInstance().Step();
             SunController.GetInstance().Step();
             GameController.GetInstance().Step();
-            StartTurnSystem();
+            if(GameController.GetInstance().GetGameState()==GameState.RUNNING)
+                StartTurnSystem();
         }
         else {
             steppingSettler = temp;
@@ -117,13 +118,11 @@ public class TurnController {
         switch (GameController.GetInstance().GetGameState()) {
             case WON_GAME:
                 JOptionPane.showMessageDialog(gameFrame, "You've won the game!", "Holy Oil Game", JOptionPane.INFORMATION_MESSAGE);
-                gameFrame.setVisible(false);
-                GameController.GetInstance().StartApp();
+                GameController.GetInstance().CloseGame();
                 break;
             case LOST_GAME:
                 JOptionPane.showMessageDialog(gameFrame, "You've lost the game!", "Holy Oil Game", JOptionPane.ERROR_MESSAGE);
-                gameFrame.setVisible(false);
-                GameController.GetInstance().StartApp();
+                GameController.GetInstance().CloseGame();
                 break;
         }
     }

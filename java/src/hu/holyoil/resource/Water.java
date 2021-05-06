@@ -1,7 +1,13 @@
 package hu.holyoil.resource;
 
+import hu.holyoil.controller.Logger;
+import hu.holyoil.controller.SunController;
 import hu.holyoil.neighbour.Asteroid;
 import hu.holyoil.repository.ResourceBaseRepository;
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Vízjég.
  * Aszteroida magjában megtalálható nyersanyag egy fajtája.
@@ -45,6 +51,20 @@ public class Water extends AbstractBaseResource {
     @Override
     public void ReactToSunNearby(Asteroid asteroid) {
         asteroid.SetResource(null);
+        Logger.Log(SunController.GetInstance(), "Water evaporated on " + asteroid.GetId());
         ReactToGettingDestroyed();
+    }
+
+    /**
+     * Statikus, minden robotra jellemző ikon
+     */
+    protected static Image image = new ImageIcon("assets/water.gif").getImage();
+
+    /**
+     * Visszaadja az ikonját
+     */
+    @Override
+    public Image GetImage() {
+        return image;
     }
 }
